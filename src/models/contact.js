@@ -4,25 +4,18 @@ const contactSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-    },
-    phoneNumber: {
-      type: String,
-      required: true,
+      required: [true, 'Name is required'],
     },
     email: {
       type: String,
-      default: null,
+      required: [true, 'Email is required'],
+      unique: true, 
+      match: [/\S+@\S+\.\S+/, 'Please enter a valid email address'], 
     },
-    isFavourite: {
-      type: Boolean,
-      default: false,
-    },
-    contactType: {
+    phone: {
       type: String,
-      enum: ['work', 'home', 'personal'],
-      default: 'personal',
-      required: true,
+      required: [true, 'Phone is required'],
+      unique: true, 
     },
   },
   { timestamps: true }
