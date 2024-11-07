@@ -1,4 +1,5 @@
 import Contact from '../models/contact.js';
+import mongoose from 'mongoose';
 
 export const getContacts = async (req, res) => {
   try {
@@ -9,24 +10,48 @@ export const getContacts = async (req, res) => {
       data: contacts,
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch contacts." });
+    console.error(error);  
+    res.status(500).json({
+      status: 500,
+      message: "Failed to fetch contacts.",
+    });
   }
 };
+
 
 export const getContactById = async (req, res) => {
   try {
     const { contactId } = req.params;
-    const contact = await Contact.findById(contactId);
-    if (!contact) {
-      return res.status(404).json({ message: "Contact not found" });
+
+    
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid contact ID format",
+      });
     }
+
+    const contact = await Contact.findById(contactId);
+
+    
+    if (!contact) {
+      return res.status(404).json({
+        status: 404,
+        message: "Contact not found",
+      });
+    }
+
     res.status(200).json({
       status: 200,
       message: `Successfully found contact with id ${contactId}!`,
       data: contact,
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch contact." });
+    console.error(error);  
+    res.status(500).json({
+      status: 500,
+      message: "Failed to fetch contact.",
+    });
   }
 };
 
