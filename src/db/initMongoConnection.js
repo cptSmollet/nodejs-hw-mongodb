@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
-dotenv.config();  
+dotenv.config();
 
 async function initMongoConnection() {
   try {
@@ -16,7 +16,6 @@ async function initMongoConnection() {
 
     const DB_URL = `mongodb+srv://${user}:${pwd}@${url}/${db}?retryWrites=true&w=majority`;
 
-    
     await mongoose.connect(DB_URL);
     console.log('Database connection successful');
   } catch (error) {
@@ -26,6 +25,7 @@ async function initMongoConnection() {
 }
 
 export { initMongoConnection };
+
 
 
 
