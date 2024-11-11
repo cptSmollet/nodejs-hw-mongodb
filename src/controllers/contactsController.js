@@ -4,8 +4,8 @@ import Contact from '../models/contact.js';
 export async function getContacts(req, res, next) {
   try {
     const contacts = await Contact.find();
-    res.json({
-      status: 200,
+    res.status(200).json({
+      status: 'success',
       message: 'Successfully found contacts!',
       data: contacts,
     });
@@ -21,8 +21,8 @@ export async function getContactById(req, res, next) {
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));  
     }
-    res.json({
-      status: 200,
+    res.status(200).json({
+      status: 'success',
       message: 'Successfully found contact!',
       data: contact,
     });
@@ -36,7 +36,7 @@ export async function addContact(req, res, next) {
     const newContact = new Contact(req.body);
     await newContact.save();
     res.status(201).json({
-      status: 201,
+      status: 'success',
       message: 'Successfully created a contact!',
       data: newContact,
     });
@@ -60,8 +60,8 @@ export const patchContactController = async (req, res, next) => {
       return next(createHttpError(404, 'Contact not found'));  
     }
 
-    res.json({
-      status: 200,
+    res.status(200).json({
+      status: 'success',
       message: 'Successfully patched a contact!',
       data: updatedContact,
     });
@@ -78,7 +78,7 @@ export async function deleteContact(req, res, next) {
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));
     }
-    res.status(204).send();
+    res.status(204).send(); 
   } catch (error) {
     next(createHttpError(500, 'Internal Server Error'));
   }
