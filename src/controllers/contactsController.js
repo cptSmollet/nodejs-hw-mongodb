@@ -4,22 +4,38 @@ import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 import Contact from '../models/contact.js';
 
-export async function getContacts(req, res, next) { 
+export async function getAllContacts(req, res, next) {
   try {
-    const { page, perPage } = parsePaginationParams(req.query);
-    const { sortBy, sortOrder } = parseSortParams(req.query);
-    const filter = parseFilterParams(req.query);
+    const { page = 1, perPage = 4 } = req.query; 
+    const skip = (page - 1) * perPage; 
+  
+    const contacts = await Contact.find()
+      .skip(skip)
+      .limit(Number(perPage));
 
-    const result = await Contact.find(filter) 
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .sort({ [sortBy]: sortOrder });
+    const totalItems = await Contact.countDocuments(); 
 
-    res.status(200).json(result); 
+    res.json({
+      status: 200,
+      message: 'Successfully found contacts!',
+      data: {
+        contacts,
+        totalItems,
+        page: Number(page),
+        perPage: Number(perPage),
+        totalPages: Math.ceil(totalItems / perPage), 
+      },
+    });
   } catch (error) {
-    next(createHttpError(500, 'Internal Server Error'));
+    console.error('Error fetching contacts:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error fetching contacts',
+      error: error.message,
+    });
   }
 }
+
 
 export async function getContactById(req, res, next) {
   const { contactId } = req.params;
@@ -40,7 +56,19 @@ export async function getContactById(req, res, next) {
 
 export async function addContact(req, res, next) {
   try {
-    const newContact = new Contact(req.body);
+    const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+
+    if (!name || !phoneNumber || !email) {
+      return next(createHttpError(400, 'Missing required fields'));
+    }
+
+    const newContact = new Contact({
+      name,
+      phoneNumber,
+      email,
+      isFavourite,
+      contactType,
+    });
     await newContact.save();
     res.status(201).json({
       status: 'success',
@@ -72,7 +100,7 @@ export const patchContactController = async (req, res, next) => {
       message: 'Successfully patched a contact!',
       data: updatedContact,
     });
-  } catch (err) {
+  } catch (error) {
     next(createHttpError(500, 'Internal Server Error'));
   }
 };

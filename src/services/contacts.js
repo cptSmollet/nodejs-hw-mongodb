@@ -1,73 +1,36 @@
 import Contact from '../models/contact.js';
 
-export const getContacts = async ({ page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', filter = {} }) => {
-  const skip = (page - 1) * perPage;
+export const getAllContacts = async (
+  filter = {},
+  page = 1,
+  perPage = 4,
+  sortBy = 'name',
+  sortOrder = 'asc',
+) => {
+  const totalItems = await Contact.countDocuments(filter);
 
-  const contactsQuery = Contact.find();
+  const contacts = await Contact.find(filter)
+    .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+    .skip((page - 1) * perPage)
+    .limit(perPage);
 
-  // Фильтрация по типу контакта
-  if (filter.contactType) {
-    contactsQuery.where('contactType').equals(filter.contactType);
-  }
-
-  // Фильтрация по статусу избранного
-  if (filter.isFavourite !== undefined) {
-    contactsQuery.where('isFavourite').equals(filter.isFavourite);
-  }
-
-  // Пагинация и сортировка
-  const [total, contacts] = await Promise.all([
-    Contact.countDocuments(), // Количество всех документов
-    contactsQuery
-      .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 }) // Сортировка
-      .skip(skip) // Пагинация
-      .limit(perPage) // Ограничение на количество
-      .exec(),
-  ]);
-
-  const totalPages = Math.ceil(total / perPage); // Вычисление общего количества страниц
-
-  return {
-    data: contacts,
-    page,
-    perPage,
-    totalItems: total,
-    totalPages,
-    hasNextPage: page < totalPages,
-    hasPreviousPage: page > 1,
-  };
+  return { contacts, totalItems };
 };
 
-export const createContact = async ({ name, phoneNumber, email, isFavourite = false, contactType = 'personal' }) => {
-  const newContact = new Contact({
-    name,
-    phoneNumber,
-    email,
-    isFavourite,
-    contactType,
+export const getContactById = async (contactId) => {
+  return await Contact.findById(contactId);
+};
+
+export const createContact = async (newContact) => {
+  return await Contact.create(newContact);
+};
+
+export const updateContact = async (contactId, newContact) => {
+  return await Contact.findByIdAndUpdate(contactId, newContact, {
+    new: true,
   });
-
-  return await newContact.save();
 };
-export const updateContact = async (contactId, { name, phoneNumber, email, isFavourite, contactType }) => {
-  const updatedContact = await Contact.findByIdAndUpdate(
-    contactId,
-    { name, phoneNumber, email, isFavourite, contactType },
-    { new: true }
-  );
 
-  if (!updatedContact) {
-    throw new Error('Contact not found');
-  }
-
-  return updatedContact;
-};
 export const deleteContact = async (contactId) => {
-  const deletedContact = await Contact.findByIdAndDelete(contactId);
-
-  if (!deletedContact) {
-    throw new Error('Contact not found');
-  }
-
-  return deletedContact;
+  return await Contact.findByIdAndDelete(contactId);
 };

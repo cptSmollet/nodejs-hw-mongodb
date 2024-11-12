@@ -9,14 +9,11 @@ const contactSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: [true, 'Phone is required'],
-      unique: true,
-      match: [/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'],
+      unique: true, 
     },
     email: {
       type: String,
-      match: [/\S+@\S+\.\S+/, 'Please enter a valid email address'],
-      lowercase: true,
-      sparse: true, 
+      match: [/\S+@\S+\.\S+/, 'Please enter a valid email address'], 
     },
     isFavourite: {
       type: Boolean,
@@ -29,8 +26,12 @@ const contactSchema = new mongoose.Schema(
       default: 'personal',
     },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true }
 );
+
+
+contactSchema.index({ phoneNumber: 1 }, { unique: true });
+contactSchema.index({ email: 1 }, { unique: true });
 
 const Contact = mongoose.model('Contact', contactSchema);
 
