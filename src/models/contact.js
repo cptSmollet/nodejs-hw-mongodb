@@ -15,7 +15,8 @@ const contactSchema = new mongoose.Schema(
     email: {
       type: String,
       match: [/\S+@\S+\.\S+/, 'Please enter a valid email address'],
-      lowercase: true, 
+      lowercase: true,
+      sparse: true, 
     },
     isFavourite: {
       type: Boolean,
@@ -28,11 +29,8 @@ const contactSchema = new mongoose.Schema(
       default: 'personal',
     },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
-
-contactSchema.index({ phoneNumber: 1 }, { unique: true });
-contactSchema.index({ email: 1 }, { unique: true });
 
 const Contact = mongoose.model('Contact', contactSchema);
 

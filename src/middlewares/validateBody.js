@@ -1,4 +1,4 @@
-import contactsSchemaJoi from '../validation/contacts.js'; 
+import contactsSchemaJoi from '../validation/contacts.js';
 
 const validateBody = (schema) => {
   return (req, res, next) => {
@@ -10,4 +10,4 @@ const validateBody = (schema) => {
   };
 };
 
-export const validateContact = validateBody(contactsSchemaJoi);
+export default validateBody;

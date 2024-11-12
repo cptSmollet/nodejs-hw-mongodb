@@ -1,16 +1,23 @@
 import createHttpError from 'http-errors';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { parseSortParams } from '../utils/parseSortParams.js';
+import { parseFilterParams } from '../utils/parseFilterParams.js';
 import Contact from '../models/contact.js';
 
-export async function getContacts(req, res, next) {
+export async function getContacts(req, res, next) { 
   try {
-    const contacts = await Contact.find();
-    res.status(200).json({
-      status: 'success',
-      message: 'Successfully found contacts!',
-      data: contacts,
-    });
+    const { page, perPage } = parsePaginationParams(req.query);
+    const { sortBy, sortOrder } = parseSortParams(req.query);
+    const filter = parseFilterParams(req.query);
+
+    const result = await Contact.find(filter) 
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ [sortBy]: sortOrder });
+
+    res.status(200).json(result); 
   } catch (error) {
-    next(createHttpError(500, 'Internal Server Error'));  
+    next(createHttpError(500, 'Internal Server Error'));
   }
 }
 
@@ -19,7 +26,7 @@ export async function getContactById(req, res, next) {
   try {
     const contact = await Contact.findById(contactId);
     if (!contact) {
-      return next(createHttpError(404, 'Contact not found'));  
+      return next(createHttpError(404, 'Contact not found'));
     }
     res.status(200).json({
       status: 'success',
@@ -27,7 +34,7 @@ export async function getContactById(req, res, next) {
       data: contact,
     });
   } catch (error) {
-    next(createHttpError(500, 'Internal Server Error'));  
+    next(createHttpError(500, 'Internal Server Error'));
   }
 }
 
@@ -41,7 +48,7 @@ export async function addContact(req, res, next) {
       data: newContact,
     });
   } catch (error) {
-    next(createHttpError(500, 'Internal Server Error'));  
+    next(createHttpError(500, 'Internal Server Error'));
   }
 }
 
@@ -57,7 +64,7 @@ export const patchContactController = async (req, res, next) => {
     );
 
     if (!updatedContact) {
-      return next(createHttpError(404, 'Contact not found'));  
+      return next(createHttpError(404, 'Contact not found'));
     }
 
     res.status(200).json({
@@ -66,7 +73,7 @@ export const patchContactController = async (req, res, next) => {
       data: updatedContact,
     });
   } catch (err) {
-    next(createHttpError(500, 'Internal Server Error'));  
+    next(createHttpError(500, 'Internal Server Error'));
   }
 };
 

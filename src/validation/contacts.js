@@ -1,11 +1,25 @@
-import Joi from 'joi'; 
+import Joi from 'joi';
 
 const contactsSchemaJoi = Joi.object({
-  name: Joi.string().min(3).max(50).required(),
-  phoneNumber: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).required(),
-  email: Joi.string().email().optional(),
-  isFavourite: Joi.boolean().optional(),
-  contactType: Joi.string().valid('work', 'home', 'personal').optional(),
+  name: Joi.string().min(3).max(50).required().messages({
+    'string.base': 'Name should be a string',
+    'string.min': 'Name should have at least 3 characters',
+    'string.max': 'Name should have at most 20 characters',
+    'any.required': 'Name is required',
+  }),
+  phoneNumber: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).required().messages({
+    'string.pattern.base': 'Phone number must be in a valid format.',
+    'any.required': 'Phone number is required',
+  }),
+  email: Joi.string().email().optional().messages({
+    'string.email': 'Invalid email format',
+  }),
+  isFavourite: Joi.boolean().optional().messages({
+    'boolean.base': 'IsFavourite must be a boolean value.',
+  }),
+  contactType: Joi.string().valid('work', 'home', 'personal').optional().messages({
+    'any.only': 'Contact type must be one of "work", "home", or "personal".',
+  }),
 });
 
 export default contactsSchemaJoi;
