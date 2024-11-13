@@ -27,7 +27,7 @@ export async function getAllContacts(req, res, next) {
       status: 200, 
       message: 'Successfully found contacts!',
       data: {
-        contacts,
+        data: contacts,
         totalItems,
         page: Number(page),
         perPage: Number(perPage),
@@ -124,10 +124,7 @@ export async function deleteContact(req, res, next) {
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));
     }
-    res.status(200).json({
-      status: 204,
-      message: "Successfully deleted contact!",
-    });
+    res.status(200).json();
   } catch (error) {
     next(createHttpError(500, 'Internal Server Error'));
   }
