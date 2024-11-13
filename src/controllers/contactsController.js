@@ -6,7 +6,7 @@ import Contact from '../models/contact.js';
 
 export async function getAllContacts(req, res, next) {
   try {
-    const { page = 1, perPage = 4, sortBy = 'name', sortOrder = 'asc' } = req.query; 
+    const { page = 1, perPage = 4, sortBy = 'name', sortOrder = 'asc' } = req.query;
     const skip = (page - 1) * perPage;
 
     const sortOptions = {};
@@ -15,16 +15,16 @@ export async function getAllContacts(req, res, next) {
     const contacts = await Contact.find()
       .skip(skip)
       .limit(Number(perPage))
-      .sort(sortOptions); 
+      .sort(sortOptions);
 
     const totalItems = await Contact.countDocuments();
-    const totalPages = Math.ceil(totalItems / perPage); 
+    const totalPages = Math.ceil(totalItems / perPage);
 
     const hasPreviousPage = page > 1;
     const hasNextPage = page < totalPages;
 
     res.json({
-      status: 200, 
+      status: 200,
       message: 'Successfully found contacts!',
       data: {
         contacts,
@@ -32,21 +32,15 @@ export async function getAllContacts(req, res, next) {
         page: Number(page),
         perPage: Number(perPage),
         totalPages,
-        hasPreviousPage, 
-        hasNextPage, 
+        hasPreviousPage,
+        hasNextPage,
       },
     });
   } catch (error) {
     console.error('Error fetching contacts:', error);
-    res.status(500).json({
-      status: 500, 
-      message: 'Error fetching contacts',
-      error: error.message,
-    });
+    next(createHttpError(500, 'Error fetching contacts'));
   }
 }
-
-
 
 export async function getContactById(req, res, next) {
   const { contactId } = req.params;
