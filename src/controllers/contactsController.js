@@ -6,35 +6,46 @@ import Contact from '../models/contact.js';
 
 export async function getAllContacts(req, res, next) {
   try {
-    const { page = 1, perPage = 4 } = req.query; 
-    const skip = (page - 1) * perPage; 
-  
+    const { page = 1, perPage = 4, sortBy = 'name', sortOrder = 'asc' } = req.query; 
+    const skip = (page - 1) * perPage;
+
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
     const contacts = await Contact.find()
       .skip(skip)
-      .limit(Number(perPage));
+      .limit(Number(perPage))
+      .sort(sortOptions); 
 
-    const totalItems = await Contact.countDocuments(); 
+    const totalItems = await Contact.countDocuments();
+    const totalPages = Math.ceil(totalItems / perPage); 
+
+    const hasPreviousPage = page > 1;
+    const hasNextPage = page < totalPages;
 
     res.json({
-      status: 200,
+      status: 200, 
       message: 'Successfully found contacts!',
       data: {
         contacts,
         totalItems,
         page: Number(page),
         perPage: Number(perPage),
-        totalPages: Math.ceil(totalItems / perPage), 
+        totalPages,
+        hasPreviousPage, 
+        hasNextPage, 
       },
     });
   } catch (error) {
     console.error('Error fetching contacts:', error);
     res.status(500).json({
-      status: 'error',
+      status: 500, 
       message: 'Error fetching contacts',
       error: error.message,
     });
   }
 }
+
 
 
 export async function getContactById(req, res, next) {
@@ -45,7 +56,7 @@ export async function getContactById(req, res, next) {
       return next(createHttpError(404, 'Contact not found'));
     }
     res.status(200).json({
-      status: 'success',
+      status: 200,
       message: 'Successfully found contact!',
       data: contact,
     });
@@ -71,7 +82,7 @@ export async function addContact(req, res, next) {
     });
     await newContact.save();
     res.status(201).json({
-      status: 'success',
+      status: 201,
       message: 'Successfully created a contact!',
       data: newContact,
     });
@@ -96,7 +107,7 @@ export const patchContactController = async (req, res, next) => {
     }
 
     res.status(200).json({
-      status: 'success',
+      status: 200,
       message: 'Successfully patched a contact!',
       data: updatedContact,
     });
@@ -113,7 +124,10 @@ export async function deleteContact(req, res, next) {
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));
     }
-    res.status(204).send(); 
+    res.status(200).json({
+      status: 204,
+      message: "Successfully deleted contact!",
+    });
   } catch (error) {
     next(createHttpError(500, 'Internal Server Error'));
   }
