@@ -1,73 +1,35 @@
 import express from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
-import Session from '../models/session.js';
+import {
+  registerController,
+  loginController,
+  refreshTokenController,
+  logoutController,
+} from '../controllers/auth.js';
+import { registerSchema, loginSchema } from '../validation/auth.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import validateBody from '../middlewares/validateBody.js';
 
-const router = express.Router();
-
-router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
-
-  try {
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const newUser = new User({
-      name,
-      email,
-      password,
-    });
-
-    await newUser.save();
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
+const authRouters = express.Router();
+const jsonParser = express.json({
+  type: 'application/json',
 });
 
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+authRouters.post(
+  '/register',
+  jsonParser,
+  validateBody(registerSchema),
+  ctrlWrapper(registerController),
+);
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+authRouters.post(
+  '/login',
+  jsonParser,
+  validateBody(loginSchema),
+  ctrlWrapper(loginController),
+);
 
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+authRouters.post('/refresh', ctrlWrapper(refreshTokenController));
 
-    const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '15m',
-    });
+authRouters.post('/logout', ctrlWrapper(logoutController));
 
-    const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, {
-      expiresIn: '7d',
-    });
-
-    const session = new Session({
-      userId: user._id,
-      accessToken,
-      refreshToken,
-      accessTokenValidUntil: new Date(Date.now() + 15 * 60 * 1000), // 15 минут
-      refreshTokenValidUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 дней
-    });
-
-    await session.save();
-
-    res.json({
-      message: 'Login successful',
-      accessToken,
-      refreshToken,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-export default router;
+export default authRouters;

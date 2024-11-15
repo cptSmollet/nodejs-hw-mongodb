@@ -4,7 +4,6 @@ const sessionSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
       required: true,
     },
     accessToken: {
@@ -24,7 +23,10 @@ const sessionSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    versionKey: false,
+    timestamps: true,
+  }
 );
 
 const Session = mongoose.model('Session', sessionSchema);

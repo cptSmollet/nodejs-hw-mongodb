@@ -11,7 +11,7 @@ import isValidId from '../middlewares/isValidId.js';
 import validateBody from '../middlewares/validateBody.js'; 
 import contactsSchemaJoi from '../validation/contacts.js'; 
 import { ctrlWrapper } from '../utils/ctrlWrapper.js'; 
-import authenticate from './middleware/authenticate';
+import authenticate from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
