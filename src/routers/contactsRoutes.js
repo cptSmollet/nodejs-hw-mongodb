@@ -28,4 +28,3 @@ router.patch('/:contactId', isValidId, validateBody(contactsSchemaJoi), ctrlWrap
 router.delete('/:contactId', isValidId, ctrlWrapper(deleteContact));
 
 export default router;
-

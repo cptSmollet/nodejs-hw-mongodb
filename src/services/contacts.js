@@ -45,8 +45,8 @@ export const createContact = async (newContact) => {
   return await Contact.create(newContact);
 };
 
-export const updateContact = async (contactId, newContact) => {
-  return await Contact.findOneAndUpdate({ _id: contactId }, newContact, {
+export const updateContact = async (contactId, userId, newContact) => {
+  return await Contact.findOneAndUpdate({ _id: contactId, userId }, newContact, {
     new: true,
   });
 };

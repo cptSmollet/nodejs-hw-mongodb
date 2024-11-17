@@ -1,23 +1,21 @@
 import createHttpError from 'http-errors';
-import { parsePaginationParams } from '../utils/parsePaginationParams.js';
-import { parseSortParams } from '../utils/parseSortParams.js';
-import { parseFilterParams } from '../utils/parseFilterParams.js';
 import Contact from '../models/contact.js';
 
 export async function getAllContacts(req, res, next) {
   try {
     const { page = 1, perPage = 4, sortBy = 'name', sortOrder = 'asc' } = req.query;
+    const { userId } = req.user;  
     const skip = (page - 1) * perPage;
 
     const sortOptions = {};
     sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    const contacts = await Contact.find()
+    const contacts = await Contact.find({ userId })
       .skip(skip)
       .limit(Number(perPage))
       .sort(sortOptions);
 
-    const totalItems = await Contact.countDocuments();
+    const totalItems = await Contact.countDocuments({ userId });
     const totalPages = Math.ceil(totalItems / perPage);
 
     const hasPreviousPage = page > 1;
@@ -44,8 +42,9 @@ export async function getAllContacts(req, res, next) {
 
 export async function getContactById(req, res, next) {
   const { contactId } = req.params;
+  const { userId } = req.user;
   try {
-    const contact = await Contact.findById(contactId);
+    const contact = await Contact.findOne({ _id: contactId, userId });  
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));
     }
@@ -62,6 +61,7 @@ export async function getContactById(req, res, next) {
 export async function addContact(req, res, next) {
   try {
     const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+    const { userId } = req.user;  
 
     if (!name || !phoneNumber || !email) {
       return next(createHttpError(400, 'Missing required fields'));
@@ -73,6 +73,7 @@ export async function addContact(req, res, next) {
       email,
       isFavourite,
       contactType,
+      userId, 
     });
     await newContact.save();
     res.status(201).json({
@@ -88,10 +89,11 @@ export async function addContact(req, res, next) {
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+  const { userId } = req.user;
 
   try {
-    const updatedContact = await Contact.findByIdAndUpdate(
-      contactId,
+    const updatedContact = await Contact.findOneAndUpdate(
+      { _id: contactId, userId },  
       { name, phoneNumber, email, isFavourite, contactType },
       { new: true }
     );
@@ -112,8 +114,9 @@ export const patchContactController = async (req, res, next) => {
 
 export async function deleteContact(req, res, next) {
   const { contactId } = req.params;
+  const { userId } = req.user;
   try {
-    const contact = await Contact.findByIdAndDelete(contactId);
+    const contact = await Contact.findOneAndDelete({ _id: contactId, userId });  
 
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));
