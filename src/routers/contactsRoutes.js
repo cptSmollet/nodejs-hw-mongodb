@@ -12,8 +12,13 @@ import validateBody from '../middlewares/validateBody.js';
 import contactsSchemaJoi from '../validation/contacts.js'; 
 import { ctrlWrapper } from '../utils/ctrlWrapper.js'; 
 import authenticate from '../middlewares/authenticate.js';
+import { upload } from '../middlewares/multer.js';
 
 const router = express.Router();
+
+const jsonParser = express.json({
+  type: 'application/json',
+});
 
 router.use(authenticate);
 

@@ -1,14 +1,13 @@
-import Joi from 'joi';
+import createHttpError from 'http-errors';
 
-const validateBody = (schema) => (req, res, next) => {
-  const { error } = schema.validate(req.body);
-  if (error) {
-    return res.status(400).json({
-      status: 400,
-      message: error.details[0].message,
-    });
-  }
-  next();
+export const validateBody = (schema) => {
+  return (req, res, next) => {
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return next(createHttpError(400, error.details[0].message));
+    }
+    next();
+  };
 };
 
 export default validateBody;

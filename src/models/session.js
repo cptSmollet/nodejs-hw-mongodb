@@ -22,6 +22,14 @@ const sessionSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    resetPasswordToken: {
+      type: String,  
+      required: false,
+    },
+    resetPasswordExpires: {
+      type: Date,  
+      required: false,
+    },
   },
   {
     versionKey: false,

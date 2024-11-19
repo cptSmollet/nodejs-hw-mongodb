@@ -20,6 +20,7 @@ const contactsSchemaJoi = Joi.object({
   contactType: Joi.string().valid('work', 'home', 'personal').optional().messages({
     'any.only': 'Contact type must be one of "work", "home", or "personal".',
   }),
+  photo: Joi.string().optional(),
 });
 
 export default contactsSchemaJoi;

@@ -1,20 +1,25 @@
-function parseContactType(contactType) {
-    if (typeof contactType !== 'string') return;
-  
-    const validContactTypes = ['work', 'home', 'personal'];
-    return validContactTypes.includes(contactType) ? contactType : undefined;
+function parseNumber(value) {
+  if (typeof value !== 'string') {
+    return undefined;
   }
-  function parseIsFavourite(isFavourite) {
-    if (typeof isFavourite !== 'string') return;
-  
-    return isFavourite === 'true' ? 'true' : isFavourite === 'false' ? 'false' : undefined;
+
+  const parsedNumber = parseInt(value);
+
+  if (Number.isNaN(parsedNumber) === true) {
+    return undefined;
   }
-  export function parseFilterParams(query) {
-    const { contactType, isFavourite } = query;
-  
-    return {
-      contactType: parseContactType(contactType),
-      isFavourite: parseIsFavourite(isFavourite),
-    };
-  }
-  
+
+  return value;
+}
+
+export function parseFilterParams(query) {
+  const { minAge, maxAge } = query;
+
+  const parsedMinAge = parseNumber(minAge);
+  const parsedMaxAge = parseNumber(maxAge);
+
+  return {
+    minAge: parsedMinAge,
+    maxAge: parsedMaxAge,
+  };
+}

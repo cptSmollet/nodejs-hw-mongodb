@@ -1,25 +1,37 @@
-import { SORT_ORDER } from '../constants/index.js';
-
 function parseSortBy(value) {
   if (typeof value !== 'string') {
-    return '_id'; 
+    return '_id';
   }
 
-  const allowedKeys = ['name'];
-  return allowedKeys.includes(value) ? value : '_id'; 
+  const keys = ['_id', 'name', 'gender', 'age', 'onDuty', 'createdAt'];
+
+  if (keys.includes(value) !== true) {
+    return '_id';
+  }
+
+  return value;
 }
 
 function parseSortOrder(value) {
   if (typeof value !== 'string') {
-    return SORT_ORDER.ASC; 
+    return 'asc';
   }
 
-  return [SORT_ORDER.ASC, SORT_ORDER.DESC].includes(value) ? value : SORT_ORDER.ASC;
+  if (['asc', 'desc'].includes(value) !== true) {
+    return 'asc';
+  }
+
+  return value;
 }
+
 export function parseSortParams(query) {
   const { sortBy, sortOrder } = query;
+
+  const parsedSortBy = parseSortBy(sortBy);
+  const parsedSortOrder = parseSortOrder(sortOrder);
+
   return {
-    sortBy: parseSortBy(sortBy),
-    sortOrder: parseSortOrder(sortOrder),
+    sortBy: parsedSortBy,
+    sortOrder: parsedSortOrder,
   };
 }
