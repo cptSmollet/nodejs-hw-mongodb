@@ -4,7 +4,7 @@ const contactsSchemaJoi = Joi.object({
   name: Joi.string().min(3).max(50).required().messages({
     'string.base': 'Name should be a string',
     'string.min': 'Name should have at least 3 characters',
-    'string.max': 'Name should have at most 20 characters',
+    'string.max': 'Name should have at most 50 characters',
     'any.required': 'Name is required',
   }),
   phoneNumber: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).required().messages({
@@ -20,7 +20,7 @@ const contactsSchemaJoi = Joi.object({
   contactType: Joi.string().valid('work', 'home', 'personal').optional().messages({
     'any.only': 'Contact type must be one of "work", "home", or "personal".',
   }),
-  photo: Joi.string().optional(),
+  photo: Joi.string().optional(), 
 });
 
 export default contactsSchemaJoi;

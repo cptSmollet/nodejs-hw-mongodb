@@ -95,23 +95,27 @@ export const requestResetEmail = async (email) => {
     process.env.JWT_SECRET,
     { expiresIn: '5m' },
   );
+  
   const html = handlebars.compile(RESET_PASSWORD_TEMPLATE);
+  const emailHtml = html({
+    resetToken,
+    appDomain: process.env.APP_DOMAIN,  
+  });
+
   try {
     await sendEmail({
       from: process.env.SMTP_FROM,
       to: email,
       subject: 'Password Reset',
-      html: html({ resetToken }),
+      html: emailHtml,  
     });
   } catch (error) {
     console.error(error);
-
-    throw createHttpError(
-      500,
-      'Failed to send the email, please try again later.',
-    );
+    throw createHttpError(500, 'Failed to send the email, please try again later.');
   }
-};
+};  
+
+
 
 export const resetPassword = async (password, token) => {
   try {
