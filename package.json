@@ -7,7 +7,10 @@
   "scripts": {
     "lint": "eslint src/**/*.js",
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "build": "npm run build-docs",
+    "build-docs": "redocly bundle --ext json -o docs/swagger.json",
+    "preview-docs": "redocly preview-docs"
   },
   "keywords": [
     "nodejs",
@@ -34,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
+    "@redocly/cli": "^1.25.15",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "nodemon": "^3.1.7"
