@@ -1,25 +1,38 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import createHttpError from 'http-errors';
-import Contact from '../models/contact.js';
+import Contact from '../models/Сontact.js';
 import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
 
 export async function getAllContacts(req, res, next) {
   try {
-    const { page = 1, perPage = 4, sortBy = 'name', sortOrder = 'asc' } = req.query;
-    const { userId } = req.user;  
-    const skip = (page - 1) * perPage;
+    const {
+      page = 1,
+      perPage = 4,
+      sortBy = 'name',
+      sortOrder = 'asc',
+      type,
+      isFavourite,
+    } = req.query;
 
-    const sortOptions = {};
-    sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    const { _id: userId } = req.user;
 
-    const contacts = await Contact.find({ userId })
-      .skip(skip)
-      .limit(Number(perPage))
-      .sort(sortOptions);
+    const filter = { userId };
 
-    const totalItems = await Contact.countDocuments({ userId });
-    const totalPages = Math.ceil(totalItems / perPage);
+    if (type !== undefined) {
+      filter.contactType = type;
+    }
+    if (isFavourite !== undefined) {
+      filter.isFavourite = isFavourite === 'true';
+    }
+
+    const contacts = await Contact.find(filter)
+      .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })  
+      .skip((page - 1) * perPage)  
+      .limit(perPage);  
+
+    const totalItems = await Contact.countDocuments(filter);
+    const totalPages = Math.ceil(totalItems / perPage);  
 
     const hasPreviousPage = page > 1;
     const hasNextPage = page < totalPages;

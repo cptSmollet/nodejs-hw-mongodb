@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import { Contact } from '../models/contact.js';
+import { Contact } from '../models/Сontact.js';
 
 export const getAllContacts = async (
   userId,
