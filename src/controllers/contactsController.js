@@ -56,24 +56,27 @@ export async function getAllContacts(req, res, next) {
   }
 }
 
-export async function getContactById(req, res, next) {
+export const getContactById = async (req, res, next) => {
   const { contactId } = req.params;
-  const { userId } = req.user;
+  const { _id: userId } = req.user;
   try {
-    const contact = await Contact.findOne({ _id: contactId, userId });  
+    const contact = await Contact.findOne({ _id: contactId, userId });
+
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));
     }
+
     res.status(200).json({
       status: 200,
-      message: 'Successfully found contact!',
+      message: `Successfully found contact!`,
       data: contact,
     });
   } catch (error) {
     console.error('Error fetching contact by ID:', error);
     next(createHttpError(500, 'Internal Server Error'));
   }
-}
+};
+
 
 export async function addContact(req, res) {
   try {
