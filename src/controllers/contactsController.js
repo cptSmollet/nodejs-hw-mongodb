@@ -177,20 +177,23 @@ export const patchContactController = async (req, res) => {
 };
 
 export async function deleteContact(req, res, next) {
-  const { contactId } = req.params;
-  const { userId } = req.user;
   try {
-    const contact = await Contact.findOneAndDelete({ _id: contactId, userId });  
+    const { contactId } = req.params; 
+    const { _id: userId } = req.user; 
+    const result = await Contact.findOneAndDelete({ _id: contactId, userId });
 
-    if (!contact) {
-      return next(createHttpError(404, 'Contact not found'));
+    if (!result) {
+      throw createHttpError(404, 'Contact not found'); 
     }
     res.status(204).json({
       status: 204,
-      message: `Contact deleted successfully`,
+      message: 'Contact deleted successfully',
     });
   } catch (error) {
     console.error('Error deleting contact:', error);
+    if (createHttpError.isHttpError(error)) {
+      return next(error);
+    }
     next(createHttpError(500, 'Internal Server Error'));
   }
 }
