@@ -119,7 +119,7 @@ export async function addContact(req, res) {
     console.error('Error creating contact:', error);
     res.status(500).json({
       status: 500,
-      message: 'Error creating contact',
+      message: error.message,
     });
   }
 }
