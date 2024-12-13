@@ -8,8 +8,11 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
+  console.error(error);
+
   res.status(500).json({
     status: 500,
-    message: 'Something went wrong',  
+    message: 'Something went wrong', 
+    data: error.message, 
   });
 };
