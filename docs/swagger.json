@@ -241,7 +241,7 @@
                       "description": "Link to contact's photo",
                       "type": "string",
                       "format": "binary",
-                      "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png",
+                      "example": "https://res.cloudinary.com/dh3zwymb0/image/upload/image.png",
                       "default": null
                     }
                   }
@@ -382,17 +382,17 @@
                     "name": {
                       "description": "Contact's name",
                       "type": "string",
-                      "example": "Oksana Iegorova"
+                      "example": "Petric Pyatochkin"
                     },
                     "phoneNumber": {
                       "description": "Contact's phoneNumber",
                       "type": "string",
-                      "example": "+380994098275"
+                      "example": "+380502856567001"
                     },
                     "email": {
                       "description": "Contact's email",
                       "type": "string",
-                      "example": "oksanaiegorova@gmail.com"
+                      "example": "voverror@gmail.com"
                     },
                     "isFavourite": {
                       "description": "Contact's isFavourite",
@@ -416,7 +416,7 @@
                       "description": "Link to contact's photo",
                       "type": "string",
                       "format": "binary",
-                      "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png",
+                      "example": "https://res.cloudinary.com/dh3zwymb0/image/upload/image.png",
                       "default": null
                     }
                   }
@@ -570,7 +570,7 @@
               "description": "Link to contact's photo",
               "type": "string",
               "format": "binary",
-              "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png",
+              "example": "https://res.cloudinary.com/dh3zwymb0/image/upload/image.png",
               "default": null
             }
           }

@@ -9,12 +9,12 @@ info:
 tags:
   - name: Contacts
     description: Operations related to contacts
-    - name: Auth
+  - name: Auth
     description: Auth operations.
 servers:
   - url: http://localhost:3000
   - url: https://nodejs-hw-mongodb-n8me.onrender.com
-paths:  
+paths:
   /contacts:
     get:
       $ref: '../swagger/paths/contacts/get.yaml'
