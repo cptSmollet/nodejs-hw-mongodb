@@ -1,25 +1,38 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import createHttpError from 'http-errors';
-import Contact from '../models/contact.js';
+import Contact from '../models/Сontact.js';
 import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
 
 export async function getAllContacts(req, res, next) {
   try {
-    const { page = 1, perPage = 4, sortBy = 'name', sortOrder = 'asc' } = req.query;
-    const { userId } = req.user;  
-    const skip = (page - 1) * perPage;
+    const {
+      page = 1,
+      perPage = 4,
+      sortBy = 'name',
+      sortOrder = 'asc',
+      type,
+      isFavourite,
+    } = req.query;
 
-    const sortOptions = {};
-    sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    const { _id: userId } = req.user;
 
-    const contacts = await Contact.find({ userId })
-      .skip(skip)
-      .limit(Number(perPage))
-      .sort(sortOptions);
+    const filter = { userId };
 
-    const totalItems = await Contact.countDocuments({ userId });
-    const totalPages = Math.ceil(totalItems / perPage);
+    if (type !== undefined) {
+      filter.contactType = type;
+    }
+    if (isFavourite !== undefined) {
+      filter.isFavourite = isFavourite === 'true';
+    }
+
+    const contacts = await Contact.find(filter)
+      .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })  
+      .skip((page - 1) * perPage)  
+      .limit(perPage);  
+
+    const totalItems = await Contact.countDocuments(filter);
+    const totalPages = Math.ceil(totalItems / perPage);  
 
     const hasPreviousPage = page > 1;
     const hasNextPage = page < totalPages;
@@ -43,24 +56,27 @@ export async function getAllContacts(req, res, next) {
   }
 }
 
-export async function getContactById(req, res, next) {
+export const getContactById = async (req, res, next) => {
   const { contactId } = req.params;
-  const { userId } = req.user;
+  const { _id: userId } = req.user;
   try {
-    const contact = await Contact.findOne({ _id: contactId, userId });  
+    const contact = await Contact.findOne({ _id: contactId, userId });
+
     if (!contact) {
       return next(createHttpError(404, 'Contact not found'));
     }
+
     res.status(200).json({
       status: 200,
-      message: 'Successfully found contact!',
+      message: `Successfully found contact!`,
       data: contact,
     });
   } catch (error) {
     console.error('Error fetching contact by ID:', error);
     next(createHttpError(500, 'Internal Server Error'));
   }
-}
+};
+
 
 export async function addContact(req, res) {
   try {
@@ -103,7 +119,7 @@ export async function addContact(req, res) {
     console.error('Error creating contact:', error);
     res.status(500).json({
       status: 500,
-      message: 'Error creating contact',
+      message: error.message,
     });
   }
 }
@@ -164,20 +180,23 @@ export const patchContactController = async (req, res) => {
 };
 
 export async function deleteContact(req, res, next) {
-  const { contactId } = req.params;
-  const { userId } = req.user;
   try {
-    const contact = await Contact.findOneAndDelete({ _id: contactId, userId });  
+    const { contactId } = req.params; 
+    const { _id: userId } = req.user; 
+    const result = await Contact.findOneAndDelete({ _id: contactId, userId });
 
-    if (!contact) {
-      return next(createHttpError(404, 'Contact not found'));
+    if (!result) {
+      throw createHttpError(404, 'Contact not found'); 
     }
     res.status(204).json({
       status: 204,
-      message: `Contact deleted successfully`,
+      message: 'Contact deleted successfully',
     });
   } catch (error) {
     console.error('Error deleting contact:', error);
+    if (createHttpError.isHttpError(error)) {
+      return next(error);
+    }
     next(createHttpError(500, 'Internal Server Error'));
   }
 }
