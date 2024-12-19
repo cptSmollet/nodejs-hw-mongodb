@@ -4,40 +4,35 @@ required:
   - name
   - phoneNumber
   - contactType
-  - userId
 properties:
   _id:
     description: "Contact's id"
     type: string
-    example: 675ad90cae6e7b712f6b9a3d
+    example: 664ca67erae7f10c88b598y
   name:
     description: "Contact's name"
     type: string
-    example: 'Spanch Bob'
+    example: 'John Doe'
   phoneNumber:
-    description: "Contact's phoneNumber"
-    type: string
-    example: '+38002587007'
-  email:
-    description: "Contact's email"
-    type: string
-    example: 'bikiniBottom@gmail.com'
-  isFavourite:
-    description: "Contact's isFavorite"
-    type: boolean
-    example: false
+    description: "Contact's phone number"
+    type: number
+    example: 123123123
   contactType:
     description: "Contact's type"
     type: string
     enum: ['work', 'home', 'personal']
-    example: 'personal'
-  userId:
-    description: "Contact's user id"
+  email:
+    description: "Contact's email"
     type: string
-    example: 675ad90cae6e7b712f6b9a3d
+  isFavourite:
+    description: 'Is contact favourite or not'
+    type: boolean
+    example: false
+  userId:
+    description: 'Contact shows only to user with this id'
+    type: string
+    example: 671b9f649de31bc33ce7bcf9
   photo:
     description: "Link to contact's photo"
     type: string
-    format: binary
     example: https://res.cloudinary.com/dh3zwymb0/image/upload/v1734007310/xlmj4ccdn0x4fxfjyntw.jpg
-    default: null
